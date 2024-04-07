@@ -163,39 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
           console.error('Error handling map click event:', error);
         }
       };
-    // Function to fetch data from JSON and add markers
-    // const addMarkersFromJSON = (map) => {
-    //     fetch('data.json')
-    //         .then(response => {
-    //             if (!response.ok) {
-    //                 throw new Error('Network response was not ok');
-    //             }
-    //             return response.json();
-    //         })
-    //         .then(data => {
-    //             data.forEach(point => {
-    //                 var latitude = point.Latitude;
-    //                 var longitude = point.Longitude;
-    //                 if (!isNaN(latitude) && !isNaN(longitude)) {
-    //                     var customIcon = L.divIcon({
-    //                         className: 'custom-marker',
-    //                         html: '<div class="circle"></div>',
-    //                         iconSize: [20, 20]
-    //                     });
-
-    //                     var marker = L.marker([latitude, longitude], { icon: customIcon }).addTo(map);
-    //                     marker.bindPopup(`<b>${point["Accident Fields_Reference Number"]}</b><br>Latitude: ${latitude}, Longitude: ${longitude}`);
-    //                 } else {
-    //                     console.error('Invalid coordinates for data point:', point);
-    //                 }
-    //             });
-    //         })
-    //         .catch(error => {
-    //             console.log('Error noted !!! ');
-    //             console.error('Error fetching JSON data:', error);
-    //         });
-    // };
-
+    
     // Geocode an address using Nominatim API
     const geocodeAddress = async (address) => {
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${address}`;
