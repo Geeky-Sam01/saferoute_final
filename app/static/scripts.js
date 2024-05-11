@@ -32,7 +32,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            data.forEach(item => {
+            data.forEach(
+                item => {
                 const suggestion = document.createElement('div');
                 suggestion.textContent = item.display_name;
                 suggestion.classList.add('suggestion');
@@ -68,12 +69,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Leaflet map initialization
     const initializeMap = () => {
-        const map = L.map('map').setView([22.5726, 88.3639], 5);
+        const map = L.map('map').setView([53.8008, -1.5491],12);
         const mapLink = "<a href='http://openstreetmap.org'>OpenStreetMap</a>";
 
         L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: `Leaflet &copy; ${mapLink}, contribution`,
-            maxZoom: 18
+            maxZoom: 20
         }).addTo(map);
 
         const terrainLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
@@ -110,11 +111,9 @@ document.addEventListener("DOMContentLoaded", function () {
       };
 
 
-      // Function to handle map click event
       const handleMapClick = async (event) => {
         const clickedLatLng = event.latlng;
 
-        // Perform reverse geocoding using Nominatim API
         const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${clickedLatLng.lat}&lon=${clickedLatLng.lng}&zoom=18&addressdetails=1`;
 
         try {
@@ -163,7 +162,39 @@ document.addEventListener("DOMContentLoaded", function () {
           console.error('Error handling map click event:', error);
         }
       };
-    
+
+      const addMarkersFromJSON = (map) => {
+        fetch('./static/data.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                data.forEach(point => {
+                    var latitude = point.Latitude;
+                    var longitude = point.Longitude;
+                    if (!isNaN(latitude) && !isNaN(longitude)) {
+                        var customIcon = L.divIcon({
+                            className: 'custom-marker',
+                            html: '<div class="circle"></div>',
+                            iconSize: [20, 20]
+                        });
+
+                        var marker = L.marker([latitude, longitude], { icon: customIcon }).addTo(map);
+                        marker.bindPopup(`<b>${point["Accident Fields_Reference Number"]}</b><br>Latitude: ${latitude}, Longitude: ${longitude}`);
+                    } else {
+                        console.error('Invalid coordinates for data point:', point);
+                    }
+                });
+            })
+            .catch(error => {
+                console.log('Error noted !!! ');
+                console.error('Error fetching JSON data:', error);
+            });
+    };
+
     // Geocode an address using Nominatim API
     const geocodeAddress = async (address) => {
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${address}`;
@@ -216,14 +247,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 L.latLng(destinationCoordinates[0], destinationCoordinates[1])
             ];
 
-            // Create routing control and set waypoints
             routingControl = L.Routing.control({
                 waypoints: waypoints,
                 routeWhileDragging: true,
                 show: true,
                 showAlternatives: true,
                 lineOptions: {
-                    styles: [{ color: 'blue', opacity: 0.8, weight: 5 }]
+                    styles: [{ color: 'blue', opacity: 0.8, weight: 8 }]
                 }
             }).addTo(map);
 
@@ -234,10 +264,9 @@ document.addEventListener("DOMContentLoaded", function () {
     
     const map = initializeMap();
     
-    // Example: Attach map click event listener
     map.on('click', handleMapClick);
 
-    // addMarkersFromJSON(map);
+    addMarkersFromJSON(map);
 
     document.getElementById('find-route-button').addEventListener('click', () => findRoute(map));
     
